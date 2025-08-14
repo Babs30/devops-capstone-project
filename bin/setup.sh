@@ -1,11 +1,13 @@
-#!/bin/bash
 echo "****************************************"
 echo " Setting up Capstone Environment"
 echo "****************************************"
 
 echo "Installing Python 3.9 and Virtual Environment"
-sudo apt-get update
-sudo DEBIAN_FRONTEND=noninteractive apt-get install -y python3.9 python3.9-venv
+sudo apt update
+sudo apt install -y software-properties-common
+sudo add-apt-repository ppa:deadsnakes/ppa
+sudo apt update
+sudo apt install -y python3.9 python3.9-venv python3.9-distutils
 
 echo "Checking the Python version..."
 python3.9 --version
