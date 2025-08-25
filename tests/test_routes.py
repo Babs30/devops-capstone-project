@@ -164,3 +164,39 @@ class TestAccountService(TestCase):
         message = response.get_json()
         self.assertEqual(message["Error"], "accounts cannot be found" )
 
+    def test_update_an_account(self):
+        """
+        it should update an existing account
+        """
+        account = self._create_accounts(1)[0]
+        account.name = "Richard"
+        response = self.client.put(f"{BASE_URL}/{account.id}", json=account.serialize())
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        
+        new_account = response.get_json()
+        self.assertEqual(new_account["name"], "Richard")
+    
+    def test_invalid_update_input(self):
+        """
+        it should return a bad request status message if there are no inputs data
+        """
+        account = self._create_accounts(1)[0]
+        
+        response = self.client.put(f"{BASE_URL}/{account.id}", data=None, content_type="application/json")
+
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertIn("No input data provided", response.get_data(as_text=True))
+
+    def test_update_account_not_found(self):
+        """
+        it should return not found status message if the data does not exist in database
+        """
+        account = self._create_accounts(1)[0]
+        response = self.client.put(f"{BASE_URL}/0", json=account.serialize())
+
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertIn("not found", response.get_data(as_text=True))
+        
+
+        
+   
