@@ -75,6 +75,7 @@ def  list_all_accounts():
    
    account_list = [account.serialize() for account in accounts]
 
+   app.logger.info("Returning [%s] accounts", len(account_list))
    return jsonify(account_list), status.HTTP_200_OK
 
 
@@ -92,17 +93,34 @@ def read_account(account_id):
     
     account = Account.find(account_id)
     if not account:
-        abort(status.HTTP_404_NOT_FOUND, f"The account with the id [{account_id}] cannot be found")   
-        
+        abort(status.HTTP_404_NOT_FOUND, f"The account with the id [{account_id}] cannot be found")
+           
     return account.serialize(), status.HTTP_200_OK
 
 
 ######################################################################
 # UPDATE AN EXISTING ACCOUNT
 ######################################################################
-
 # ... place you code here to UPDATE an account ...
+@app.route("/accounts/<int:account_id>", methods=["PUT"])
+def update_an_account(account_id):
+    """
+    This endpoint updates an existing account
+    """
+    app.logger.info("Request to update existing account with id %s", account_id)
+    account = Account.find(account_id)
+    if not account:
+        abort(status.HTTP_404_NOT_FOUND, f"account with id: [{account_id}] is not found")
 
+    data = request.get_json(silent=True)
+    if not data:
+        abort(status.HTTP_400_BAD_REQUEST, "No input data provided")
+    
+    account.name =  request.get_json()["name"]
+    account.update()
+
+    app.logger.info("Returning updated account for id %s", account_id)
+    return account.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # DELETE AN ACCOUNT
