@@ -196,7 +196,27 @@ class TestAccountService(TestCase):
 
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
         self.assertIn("not found", response.get_data(as_text=True))
-        
 
+    def test_delete_an_account(self):
+        """
+        it should delete an account given the index of the account
+        """
+        account = self._create_accounts(3)[2]
+
+        response_del = self.client.delete(f"{BASE_URL}/{account.id}")
+        self.assertEqual(response_del.status_code, status.HTTP_200_OK)
+        self.assertIn("Successful", response_del.get_data(as_text=True))
+
+        response_ret = self.client.get(f"{BASE_URL}/{account.id}")
+        self.assertEqual(response_ret.status_code, status.HTTP_404_NOT_FOUND)
+    
+    def test_account_to_delete_not_found(self):
+        """
+        it should return account not found when account to be deleted does not exist in database
+        """
+        account = self._create_accounts(2)
+        response = self.client.delete(f"{BASE_URL}/0")
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+  
         
    
